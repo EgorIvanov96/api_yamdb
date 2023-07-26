@@ -23,6 +23,7 @@ class Review(models.Model):
     text = models.TextField()
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='reviews')
+    score = models.IntegerField('Оценка')
 
     def __str__(self):
         return self.text
