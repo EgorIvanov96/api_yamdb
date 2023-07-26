@@ -26,7 +26,7 @@ INSTALLED_APPS = [
     'djoser',
     'review',
     'api',
-    'custom_user',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -123,4 +123,4 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-AUTH_USER_MODEL = 'custom_user.User'
+AUTH_USER_MODEL = 'users.User'
