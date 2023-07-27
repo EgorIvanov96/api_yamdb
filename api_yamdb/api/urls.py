@@ -1,7 +1,8 @@
 from django.urls import path, include
+from .views import UserRegisterView
 
 urlpatterns = [
-    path('auth/signup/', include('djoser.urls')),
-    path('auth/token/', include('djoser.urls')),
-    path('users/', include('djoser.urls')),
+    path('auth/signup/', UserRegisterView.as_view()),
+    path('auth/token/', UserRegisterView.as_view()),
+    path('users/', UserRegisterView.as_view()),
 ]

@@ -1,14 +1,14 @@
 from django.shortcuts import render
 from users.users import User
 from rest_framework import permissions
-from .permissions import AllowsNoToken
 from django.core.mail import send_mail
 from .serializers import UserRegisterSerializer
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
-class UserRegisterViewSet(APIView):
+class UserRegisterView(APIView):
     def post(self, request):
         serializer_class = UserRegisterSerializer(data=request.data)
         if serializer.is_valid():
