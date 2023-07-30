@@ -6,13 +6,14 @@ from .serializers import UserRegistrationSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import serializers
 
 
 class UserRegistrationView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
-        serializer_class = UserRegistrationSerializer(data=request.data)
+        serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
             user = User.objects.get_or_create()
