@@ -2,13 +2,13 @@ from django.shortcuts import render
 from users.users import User
 from rest_framework import permissions
 from django.core.mail import send_mail
-from .serializers import UserRegisterSerializer
+from .serializers import UserRegistrationSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 
-class UserRegisterView(APIView):
+class UserRegistrationView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):

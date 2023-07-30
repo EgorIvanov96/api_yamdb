@@ -1,7 +1,7 @@
 from django.urls import path, include
-from .views import UserRegisterView
+from .views import UserRegistrationView
 
 urlpatterns = [
-    path('auth/token/', token_post),
-    path('auth/signup/', signup_post),
+    # path('auth/token/', token_post),
+    path('auth/signup/', UserRegistrationView.as_view()),
 ]
