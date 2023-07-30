@@ -9,10 +9,12 @@ from rest_framework.views import APIView
 
 
 class UserRegisterView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
     def post(self, request):
-        serializer_class = UserRegisterSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
+        serializer_class = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            user = serializer.save()
             user = User.objects.get_or_create()
             default_token_generator.make_token(user)
             return send_mail(f'Token - {token}')
