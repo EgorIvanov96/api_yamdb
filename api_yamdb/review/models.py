@@ -5,7 +5,7 @@ from users.users import User
 
 class Category(models.Model):
     name = models.TextField('Категория', max_length=256)
-    slug = models.SlugField('Идентификатор', max_length=64)
+    slug = models.SlugField('Идентификатор', max_length=50)
 
     def __str__(self):
         return self.name
@@ -13,7 +13,7 @@ class Category(models.Model):
 
 class Genre(models.Model):
     name = models.TextField('Жанр', max_length=256)
-    slug = models.SlugField('Идентификатор', max_length=64)
+    slug = models.SlugField('Идентификатор', max_length=50)
 
     def __str__(self):
         return self.name
