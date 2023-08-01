@@ -1,6 +1,7 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, filters
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
+from django_filters.rest_framework import DjangoFilterBackend
 
 from review.models import Genre
 from .serializers import GenreSerializer
@@ -10,6 +11,9 @@ class GenereaViewSet(viewsets.ModelViewSet): # Жанры
     serializer_class = GenreSerializer
     pagination_class = LimitOffsetPagination
     permission_class = (permissions.IsAdminUser,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filterset_fields = ('name', 'slug')
+    search_fields = ('name', 'slug')
 
     def create(self, request, *args, **kwargs):
         # Проверяем, что slug не дублируется
