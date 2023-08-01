@@ -3,21 +3,19 @@ from rest_framework import permissions
 from .serializers import (UserRegistrationSerializer,
                           UserSerializer,
                           ProfileSerializer,
-                          TokenSerializer,
-                          )
+                          TokenSerializer,)
 from rest_framework import status, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from .permissions import (OwnersAndAdmin,
-                          SuperUserOrAdmin)
+from .permissions import SuperUserOrAdmin
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.pagination import PageNumberPagination
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class UserRegistrationView(APIView):
@@ -52,21 +50,27 @@ class TokenView(APIView):
     def post(self, request):
         serializer = TokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        username = serializer.validated_data.get('username')
-        confirmation_code = serializer.validated_data.get('confirmation_code')
-        user = get_object_or_404(User, username=username)
-
-        if not default_token_generator.check_token(user, confirmation_code):
-            message = {'confirmation_code': 'Код подтверждения невалиден'}
-            return Response(message, status=status.HTTP_400_BAD_REQUEST)
-        message = {'token': str(AccessToken.for_user(user))}
-        return Response(message, status=status.HTTP_200_OK)
+        try:
+            user = User.objects.get(username=serializer.validated_data['username'])
+            confirmation_code = user.confirmation_code
+        except User.DoesNotExist:
+            return Response(
+                {'username': 'Такой пользователь не существует.'},
+                status=status.HTTP_404_NOT_FOUND)
+        if (serializer.validated_data['confirmation_code']
+           == confirmation_code):
+            token = RefreshToken.for_user(user).access_token
+            return Response({'token': str(token)},
+                            status=status.HTTP_201_CREATED)
+        return Response(
+            {'confirmation_code': 'Код подтвердения неверный!'},
+            status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserViewSet(ModelViewSet):
+    permission_classes = (SuperUserOrAdmin, )
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (SuperUserOrAdmin, )
     filter_backends = (filters.SearchFilter,)
     search_fields = ("username",)
     lookup_field = "username"

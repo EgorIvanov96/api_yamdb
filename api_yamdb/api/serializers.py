@@ -16,7 +16,8 @@ class UserRegistrationSerializer(serializers.Serializer):
         if data.get('username') == 'me':
             raise serializers.ValidationError('Использование username '
                                               '"me" запрещено!')
-        if User.objects.filter(username=data.get('username')) and User.objects.filter(email=data.get('email')):
+        if (User.objects.filter(username=data.get('username'))
+           and User.objects.filter(email=data.get('email'))):
             return data
         if User.objects.filter(username=data.get('username')):
             raise serializers.ValidationError('Пользователь с таким username '
@@ -60,6 +61,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.RegexField(regex=r'^[\w.@+-]+$',
                                       max_length=150,
                                       required=True)
+    email = serializers.EmailField(max_length=254, required=True)
 
     class Meta(UserSerializer.Meta):
         read_only_fields = ("role",)
