@@ -1,15 +1,20 @@
-from rest_framework import viewsets, permissions, status
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework import viewsets, permissions, status, filters
+from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
 
 from review.models import Category
 from .serializers import CategorySerializer
 
-class CategoryViewSet(viewsets.ModelViewSet): # Жанры
+class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    pagination_class = LimitOffsetPagination
+    # lookup_field = 'slug'
+    pagination_class = PageNumberPagination
     permission_class = (permissions.IsAdminUser,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filterset_fields = ('name', 'slug')
+    search_fields = ('name', 'slug')
 
     def create(self, request, *args, **kwargs):
         # Проверяем, что slug не дублируется

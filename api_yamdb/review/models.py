@@ -4,8 +4,8 @@ from users.users import User
 
 
 class Category(models.Model):
-    name = models.TextField('Категория', max_length=256)
-    slug = models.SlugField('Идентификатор', max_length=50)
+    name = models.CharField('Категория', max_length=256)
+    slug = models.SlugField('Идентификатор', max_length=50, unique=True)
 
     def __str__(self):
         return self.name
