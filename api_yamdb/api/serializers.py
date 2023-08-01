@@ -5,7 +5,9 @@ from users.users import User
 class UserRegistrationSerializer(serializers.Serializer):
     """Регистрация пользователя."""
     email = serializers.EmailField(max_length=254, required=True)
-    username = serializers.CharField(max_length=150, required=True)
+    username = serializers.RegexField(max_length=150,
+                                      required=True,
+                                      regex=r'^[\w.@+-]+$')
 
     class Meta:
         fields = ('username', 'email',)
@@ -14,7 +16,8 @@ class UserRegistrationSerializer(serializers.Serializer):
         if data.get('username') == 'me':
             raise serializers.ValidationError('Использование username '
                                               '"me" запрещено!')
-
+        if User.objects.filter(username=data.get('username')) and User.objects.filter(email=data.get('email')):
+            return data
         if User.objects.filter(username=data.get('username')):
             raise serializers.ValidationError('Пользователь с таким username '
                                               'уже существует.')
@@ -25,17 +28,21 @@ class UserRegistrationSerializer(serializers.Serializer):
         return data
 
 
-class UserTokenSerializer(serializers.Serializer):
+class TokenSerializer(serializers.Serializer):
     """Получение токена пользователя."""
-    username = serializers.CharField(max_length=150, required=True)
-    confirmation_code = serializers.CharField(required=True)
+    username = serializers.RegexField(regex=r'^[\w.@+-]+$',
+                                      max_length=150,
+                                      required=True)
+    confirmation_code = serializers.CharField(required=True, max_length=150)
 
     class Meta:
         fields = ('username', 'confirmation_code')
 
 
-class UserInfoSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(max_length=150, required=True)
+class UserSerializer(serializers.ModelSerializer):
+    username = serializers.RegexField(regex=r'^[\w.@+-]+$',
+                                      max_length=150,
+                                      required=True)
 
     class Meta:
         model = User
@@ -49,16 +56,10 @@ class UserInfoSerializer(serializers.ModelSerializer):
         )
 
 
-class MeSerializer(serializers.ModelSerializer):
-    role = serializers.CharField(read_only=True)
+class ProfileSerializer(serializers.ModelSerializer):
+    username = serializers.RegexField(regex=r'^[\w.@+-]+$',
+                                      max_length=150,
+                                      required=True)
 
-    class Meta:
-        model = User
-        fields = (
-            'username',
-            'email',
-            'first_name',
-            'last_name',
-            'bio',
-            'role'
-        )
+    class Meta(UserSerializer.Meta):
+        read_only_fields = ("role",)

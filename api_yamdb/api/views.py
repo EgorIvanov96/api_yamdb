@@ -1,27 +1,27 @@
 from users.users import User
 from rest_framework import permissions
 from .serializers import (UserRegistrationSerializer,
-                          UserInfoSerializer,
-                          MeSerializer,
-                          UserTokenSerializer,
+                          UserSerializer,
+                          ProfileSerializer,
+                          TokenSerializer,
                           )
-from rest_framework import status
+from rest_framework import status, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from .permissions import (OwnersAndAdmin,
-                          OwnerStaffOrReadOnly,
-                          IsAdminOrReadOnly)
+                          SuperUserOrAdmin)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action, api_view
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework.pagination import PageNumberPagination
 
 
 class UserRegistrationView(APIView):
+    """Регистрация пользователя."""
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
@@ -29,29 +29,28 @@ class UserRegistrationView(APIView):
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
         username = serializer.validated_data['username']
-        user, create = User.objects.get_or_create(
-                                                        username=username,
-                                                        email=email
-                                                        )
+        user, create = User.objects.get_or_create(username=username,
+                                                  email=email)
 
         confirmation_code = default_token_generator.make_token(user)
         user.confirmation_code = confirmation_code
         user.save()
         send_mail(
-                'Confirmation code',
-                confirmation_code,
-                ['yamdb@email.com'],
+                'Your Confirmation code',
+                user.confirmation_code,
+                ['yamdb@mail.com'],
                 (email, ),
                 fail_silently=False
             )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class APIGetToken(APIView):
+class TokenView(APIView):
     """Получение JWT-токена."""
+    permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
-        serializer = UserTokenSerializer(data=request.data)
+        serializer = TokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         username = serializer.validated_data.get('username')
         confirmation_code = serializer.validated_data.get('confirmation_code')
@@ -64,13 +63,15 @@ class APIGetToken(APIView):
         return Response(message, status=status.HTTP_200_OK)
 
 
-class UserInfoViewSet(ModelViewSet):
+class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserInfoSerializer
-    permission_classes = (OwnersAndAdmin, )
-    lookup_field = 'username'
-    filterset_fields = ('username')
-    search_fields = ('username', )
+    serializer_class = UserSerializer
+    permission_classes = (SuperUserOrAdmin, )
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("username",)
+    lookup_field = "username"
+    http_method_names = ("get", "post", "patch", "delete")
+    pagination_class = PageNumberPagination
 
     @action(
         methods=['GET', 'PATCH'],
@@ -79,13 +80,13 @@ class UserInfoViewSet(ModelViewSet):
         permission_classes=(IsAuthenticated,),
         )
     def get_user_info(self, request):
-        serializer = UserInfoSerializer(request.user)
-        user = get_object_or_404(User, username=self.request.user)
-        if request.method == 'PATCH':
-            serializer = MeSerializer(user, data=request.data, partial=True)
-            serializer.is_valid(raise_exception=True)
+        serializer = ProfileSerializer(
+            request.user, partial=True, data=request.data
+        )
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
+        if request.method == "PATCH":
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        elif request.method == 'GET':
-            serializer = MeSerializer(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
