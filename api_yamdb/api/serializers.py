@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from review.models import Category
+from review.models import Titles
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class TitlesSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ('name', 'slug')
-        model = Category
-        # lookup_field = 'slug'
+        fields = '__all__'
+        model = Titles
+        
