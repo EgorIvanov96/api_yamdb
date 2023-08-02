@@ -3,8 +3,8 @@ from rest_framework.pagination import LimitOffsetPagination, PageNumberPaginatio
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
-from review.models import Titles, Category, Genre, Review, Titles
-from .serializers import TitlesSerializer, CategorySerializer, GenreSerializer, ReviewSerializer
+from review.models import Titles, Category, Genre, Review, Titles, 
+from .serializers import TitlesSerializer, CategorySerializer, GenreSerializer, ReviewSerializer, CommentsSerializer, Comments
 
 from users.users import User
 from .serializers import (UserRegistrationSerializer,
@@ -162,3 +162,17 @@ class UserViewSet(ModelViewSet):
         if request.method == "PATCH":
             serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentsSerializer
+
+    def get_queryset(self):
+        review_id = self.kwargs.get("review_id")
+        return Comments.objects.filter(review=review_id)
+
+    def perform_create(self, serializer):
+        review_id = self.kwargs['review_id']
+        review = Review.objects.get(id=review_id)
+        serializer.save(author=self.request.user,
+                        review=review)
