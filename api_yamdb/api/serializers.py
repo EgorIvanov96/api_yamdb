@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from review.models import Titles, Category, Genre
+from review.models import Titles, Category, Genre, Review
 from users.users import User
 import datetime as dt
 
@@ -10,6 +10,7 @@ class TitlesSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = ('name', 'year', 'rating', 'description', 'genre', 'category')
+        # fields = 'category', 'genre', 'name', 'year'
         model = Titles
 
     def validate_year(self, value):
@@ -17,6 +18,18 @@ class TitlesSerializer(serializers.ModelSerializer):
         if value <= year_now:
             raise serializers.ValidationError('Год выпуска не может быть больше текущего года!')
         return value
+    
+    def get_fields(self):
+        fields = super().get_fields()
+        if self.context['view'].action == 'retrieve':
+            fields['rating'] = serializers.SerializerMethodField()
+        return fields
+
+    def get_rating(self, obj):
+        reviews = Review.objects.values('score')
+        scores = [review['score'] for review in reviews]
+        average_rating = math.ceil(sum(scores) / len(scores) if scores else 0)
+        return average_rating
         
 
 class CategorySerializer(serializers.ModelSerializer):
