@@ -14,7 +14,6 @@ ROLE_CHOICES = [
 
 
 class User(AbstractUser):
-    username = models.CharField(max_length=150, unique=True)
     bio = models.CharField(max_length=150, blank=True)
     role = models.CharField(max_length=150,
                             blank=True,
