@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from users.users import User
 
@@ -19,16 +20,6 @@ class Genre(models.Model):
         return self.name
 
 
-class Review(models.Model):
-    text = models.TextField()
-    author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='reviews')
-    score = models.IntegerField('Оценка')
-
-    def __str__(self):
-        return self.text
-
-
 class Titles(models.Model):
     name = models.CharField('Название', max_length=256)
     year = models.IntegerField('Год')
@@ -41,18 +32,33 @@ class Titles(models.Model):
     )
     genre = models.ManyToManyField(
         Genre,
-        null=True,
-        related_name='genres'
-    )
-    reviews = models.ForeignKey(
-        Review,
-        on_delete=models.CASCADE,
-        null=True,
-        related_name='reviews'
+        blank=True,
+        through='TitleGenre',
+        related_name='titles'
     )
 
     def __str__(self):
-        return self.text
+        return self.name
+
+
+class TitleGenre(models.Model):
+    title = models.ForeignKey(Titles, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('title', 'genre')
+
+
+class Review(models.Model):
+    text = models.TextField()
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='reviews')
+    score = models.IntegerField(
+        'Оценка',
+        validators=[MinValueValidator(1), MaxValueValidator(10)])
+    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
+    titles = models.ForeignKey(
+        Titles, on_delete=models.CASCADE, related_name='reviews')
 
 
 class Comments(models.Model):
@@ -61,5 +67,5 @@ class Comments(models.Model):
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE, related_name='comments')
     text = models.TextField()
-    created = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True)
+    pub_date = models.DateTimeField(
+        'Дата добавления', auto_now_add=True)

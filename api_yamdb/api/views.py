@@ -1,16 +1,26 @@
 from users.users import User
 from rest_framework import permissions
-from .serializers import (UserRegistrationSerializer,
+from .serializers import (GenreSerializer,
+                          UserRegistrationSerializer,
                           UserSerializer,
                           ProfileSerializer,
                           TokenSerializer,
+                          ReviewSerializer,
+                          CommentsSerializer,
+                          TitlesSerializer,
+                          CategorySerializer,
                           )
-from rest_framework import status, filters
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
+from review.models import Comments, Review, Titles, Genre, Category
 from .permissions import (OwnersAndAdmin,
                           SuperUserOrAdmin)
+
+from rest_framework import status, viewsets, filters
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status, filters
+from rest_framework.response import Response
+from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action, api_view
 from django.contrib.auth.tokens import default_token_generator
@@ -90,3 +100,87 @@ class UserViewSet(ModelViewSet):
         if request.method == "PATCH":
             serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        title_id = self.kwargs.get("title_id")
+        return Review.objects.filter(titles_id=title_id)
+
+    def perform_create(self, serializer):
+        title_id = self.kwargs['title_id']
+        title = Titles.objects.get(id=title_id)
+        serializer.save(author=self.request.user,
+                        titles_id=title)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentsSerializer
+
+    def get_queryset(self):
+        review_id = self.kwargs.get("review_id")
+        return Comments.objects.filter(review=review_id)
+
+    def perform_create(self, serializer):
+        review_id = self.kwargs['review_id']
+        review = Review.objects.get(id=review_id)
+        serializer.save(author=self.request.user,
+                        review=review)
+        if serializer.is_valid():
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class TitlesViewSet(viewsets.ModelViewSet):
+    queryset = Titles.objects.all()
+    serializer_class = TitlesSerializer
+    pagination_class = PageNumberPagination
+    #permission_classes = (permissions.IsAdminUser,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filterset_fields = ('category', 'genre', 'name', 'year')
+    search_fields = ('category', 'genre', 'name', 'year')
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    # lookup_field = 'slug'
+    #pagination_class = PageNumberPagination
+    #permission_classes = (permissions.IsAdminUser,)
+    filter_backends = (filters.SearchFilter)
+    filterset_fields = ('name', 'titles__slug')
+    search_fields = ('name', 'titles__slug')
+
+    def create(self, request, *args, **kwargs):
+        # Проверяем, что slug не дублируется
+        slug = request.data.get('slug')
+        existing_category = Category.objects.filter(slug=slug).first()
+        if existing_category:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={'error': 'Категория с таким slug уже существует.'})
+
+        return super().create(request, *args, **kwargs)
+
+
+class GenereaViewSet(viewsets.ModelViewSet): # Жанры
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    #pagination_class = LimitOffsetPagination
+    #permission_classes = (permissions.IsAdminUser,)
+    filter_backends = (filters.SearchFilter)
+    filterset_fields = ('name', 'titles__slug')
+    search_fields = ('name', 'titles__slug')
+
+    def create(self, request, *args, **kwargs):
+        # Проверяем, что slug не дублируется
+        slug = request.data.get('slug')
+        existing_category = Genre.objects.filter(slug=slug).first()
+        if existing_category:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={'error': 'Категория с таким slug уже существует.'})
+
+        return super().create(request, *args, **kwargs)
