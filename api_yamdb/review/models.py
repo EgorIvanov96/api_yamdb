@@ -44,12 +44,12 @@ class Titles(models.Model):
         null=True,
         related_name='genres'
     )
-    reviews = models.ForeignKey(
+    """reviews = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
         null=True,
         related_name='reviews'
-    )
+    )"""
 
     def __str__(self):
         return self.text
