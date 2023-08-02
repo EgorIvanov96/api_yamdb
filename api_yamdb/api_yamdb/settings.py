@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'djoser',
+    'rest_framework.authtoken',
     'review',
     'api',
     'users',
@@ -118,7 +119,11 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+<<<<<<< HEAD
     'PAGE_SIZE': 10,
+=======
+    'PAGE_SIZE': 5,
+>>>>>>> fix/users
 }
 
 SIMPLE_JWT = {
@@ -127,3 +132,6 @@ SIMPLE_JWT = {
 }
 
 AUTH_USER_MODEL = 'users.User'
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
