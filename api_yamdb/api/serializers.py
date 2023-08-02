@@ -1,7 +1,7 @@
 from rest_framework import serializers
-<<<<<<< HEAD
 
 from review.models import Titles, Category, Genre
+from users.users import User
 import datetime as dt
 
 
@@ -32,8 +32,6 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('name', 'slug')
         model = Genre
-=======
-from users.users import User
 
 
 class UserRegistrationSerializer(serializers.Serializer):
@@ -99,4 +97,3 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta(UserSerializer.Meta):
         read_only_fields = ("role",)
->>>>>>> fix/users
