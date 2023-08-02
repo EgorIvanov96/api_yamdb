@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.relations import SlugRelatedField
 
 from review.models import Titles, Category, Genre, Review
 from users.users import User
@@ -30,6 +31,17 @@ class TitlesSerializer(serializers.ModelSerializer):
         scores = [review['score'] for review in reviews]
         average_rating = math.ceil(sum(scores) / len(scores) if scores else 0)
         return average_rating
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username')
+    title = serializers.PrimaryKeyRelatedField(
+        read_only=True, default=serializers.CurrentUserDefault())
+
+    class Meta:
+        fields = '__all__'
+        model = Review
         
 
 class CategorySerializer(serializers.ModelSerializer):

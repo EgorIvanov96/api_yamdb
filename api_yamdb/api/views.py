@@ -3,8 +3,8 @@ from rest_framework.pagination import LimitOffsetPagination, PageNumberPaginatio
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
-from review.models import Titles, Category, Genre
-from .serializers import TitlesSerializer, CategorySerializer, GenreSerializer
+from review.models import Titles, Category, Genre, Review, Titles
+from .serializers import TitlesSerializer, CategorySerializer, GenreSerializer, ReviewSerializer
 
 from users.users import User
 from .serializers import (UserRegistrationSerializer,
@@ -50,6 +50,20 @@ class CategoryViewSet(viewsets.ModelViewSet):
                             data={'error': 'Категория с таким slug уже существует.'})
 
         return super().create(request, *args, **kwargs)
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        title_id = self.kwargs.get("title_id")
+        return Review.objects.filter(title=title_id)
+
+    def perform_create(self, serializer):
+        title_id = self.kwargs['title_id']
+        title = Titles.objects.get(id=title_id)
+        serializer.save(author=self.request.user,
+                        title=title)
     
 
 class GenereaViewSet(viewsets.ModelViewSet): # Жанры
