@@ -99,10 +99,11 @@ class UserViewSet(ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentsSerializer
+    #queryset = Comments.objects.all()
 
     def get_queryset(self):
         review_id = self.kwargs.get("review_id")
-        return Comments.objects.filter(review=review_id)
+        return Comments.objects.filter(review_id=review_id)
 
     def perform_create(self, serializer):
         review_id = self.kwargs['review_id']
@@ -184,13 +185,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")
-        print(title_id)
-        print(self.kwargs.get("title_id"))
-        print(self.kwargs)
-        return Review.objects.filter(title=title_id)
+        return Review.objects.filter(titles=title_id)
 
     def perform_create(self, serializer):
         title_id = self.kwargs['title_id']
         title = Titles.objects.get(id=title_id)
         serializer.save(author=self.request.user,
-                        title=title)
+                        titles=title)
