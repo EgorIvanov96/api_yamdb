@@ -79,7 +79,7 @@ class UserRegistrationSerializer(serializers.Serializer):
                                       regex=r'^[\w.@+-]+$')
 
     class Meta:
-        fields = ('username', 'email',)
+        fields = ('username', 'email', 'role')
 
     def validate(self, data):
         if data.get('username') == 'me':
@@ -110,9 +110,6 @@ class TokenSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    username = serializers.RegexField(regex=r'^[\w.@+-]+$',
-                                      max_length=150,
-                                      required=True)
 
     class Meta:
         model = User
@@ -130,7 +127,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.RegexField(regex=r'^[\w.@+-]+$',
                                       max_length=150,
                                       required=True)
-    email = serializers.EmailField(max_length=254, required=True)
 
     class Meta(UserSerializer.Meta):
+        model = User
         read_only_fields = ("role",)

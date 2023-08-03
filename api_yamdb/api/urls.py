@@ -23,6 +23,6 @@ router.register(r'genres', GenereaViewSet, basename='genres')
 
 urlpatterns = [
     path('v1/', include(router.urls)),
-    path('auth/token/', TokenView.as_view()),
-    path('auth/signup/', UserRegistrationView.as_view()),
+    path('v1/auth/token/', TokenView.as_view()),
+    path('v1/auth/signup/', UserRegistrationView.as_view()),
 ]

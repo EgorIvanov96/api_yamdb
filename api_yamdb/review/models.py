@@ -20,19 +20,6 @@ class Genre(models.Model):
         return self.name
 
 
-class Review(models.Model):
-    text = models.TextField()
-    author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='reviews')
-    score = models.IntegerField(
-        'Оценка',
-        validators=[MinValueValidator(1), MaxValueValidator(10)])
-    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
-
-    def __str__(self):
-        return self.text
-
-
 class Titles(models.Model):
     name = models.CharField('Название', max_length=256)
     year = models.IntegerField('Год')
@@ -46,17 +33,32 @@ class Titles(models.Model):
     genre = models.ManyToManyField(
         Genre,
         blank=True,
-        related_name='genres'
+        through='TitleGenre',
+        related_name='titles'
     )
-    """reviews = models.ForeignKey(
-        Review,
-        on_delete=models.CASCADE,
-        null=True,
-        related_name='reviews'
-    )"""
 
     def __str__(self):
-        return self.text
+        return self.name
+
+
+class TitleGenre(models.Model):
+    title = models.ForeignKey(Titles, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('title', 'genre')
+
+
+class Review(models.Model):
+    text = models.TextField()
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='reviews')
+    score = models.IntegerField(
+        'Оценка',
+        validators=[MinValueValidator(1), MaxValueValidator(10)])
+    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
+    titles = models.ForeignKey(
+        Titles, on_delete=models.CASCADE, related_name='reviews')
 
 
 class Comments(models.Model):
