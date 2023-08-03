@@ -1,3 +1,4 @@
+import math
 from rest_framework import serializers
 
 from review.models import Titles, Category, Genre, Review, Comments
@@ -6,24 +7,21 @@ import datetime as dt
 
 
 class TitlesSerializer(serializers.ModelSerializer):
-    rating = serializers.SerializerMethodField()
+    genre = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Genre.objects.all(), many=True)
+    category = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Category.objects.all())
 
     class Meta:
-        fields = ('name', 'year', 'rating', 'description', 'genre', 'category')
-        # fields = 'category', 'genre', 'name', 'year'
+        fields = ('name', 'year', 'description', 'genre', 'category')
         model = Titles
 
     def validate_year(self, value):
         year_now = dt.date.today().year
-        if value <= year_now:
-            raise serializers.ValidationError('Год выпуска не может быть больше текущего года!')
+        if value >= year_now:
+            raise serializers.ValidationError(
+                'Год выпуска не может быть больше текущего года!')
         return value
-    
-    def get_fields(self):
-        fields = super().get_fields()
-        if self.context['view'].action == 'retrieve':
-            fields['rating'] = serializers.SerializerMethodField()
-        return fields
 
     def get_rating(self, obj):
         reviews = Review.objects.values('score')
