@@ -121,7 +121,7 @@ class ListCreateDestroyViewSet(
 class CategoryViewSet(ListCreateDestroyViewSet, viewsets.GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    # lookup_field = 'slug'
+    lookup_field = 'slug'
     pagination_class = PageNumberPagination
     # permission_class = (Admin,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
@@ -147,11 +147,12 @@ class CategoryViewSet(ListCreateDestroyViewSet, viewsets.GenericViewSet):
 
 
 
-class GenereaViewSet(viewsets.ModelViewSet): # Жанры
+class GenereaViewSet(ListCreateDestroyViewSet, viewsets.GenericViewSet): # Жанры
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    lookup_field = 'slug'
     pagination_class = LimitOffsetPagination
-    permission_class = (permissions.IsAdminUser,)
+    # permission_class = (permissions.IsAdminUser,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filterset_fields = ('name', 'slug')
     search_fields = ('name', 'slug')
