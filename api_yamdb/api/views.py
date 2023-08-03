@@ -173,7 +173,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
     serializer_class = TitlesSerializer
     pagination_class = PageNumberPagination
-    permission_class = (permissions.IsAdminUser,)
+    #permission_classes = (permissions.IsAdminUser,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filterset_fields = ('category', 'genre', 'name', 'year')
     search_fields = ('category', 'genre', 'name', 'year')

@@ -23,11 +23,14 @@ class TitlesSerializer(serializers.ModelSerializer):
                 'Год выпуска не может быть больше текущего года!')
         return value
 
-    def get_rating(self, obj):
-        reviews = Review.objects.values('score')
-        scores = [review['score'] for review in reviews]
-        average_rating = math.ceil(sum(scores) / len(scores) if scores else 0)
-        return average_rating
+    def get_fields(self):
+        fields = super().get_fields()
+        if self.context['view'].action == 'retrieve':
+            fields['id'] = serializers.IntegerField()
+            fields['rating'] = serializers.SerializerMethodField()
+        elif self.context['view'].action == 'create':
+            fields['id'] = serializers.IntegerField(required=False)
+        return fields
 
 
 class ReviewSerializer(serializers.ModelSerializer):
