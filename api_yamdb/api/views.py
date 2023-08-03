@@ -13,7 +13,7 @@ from .serializers import (UserRegistrationSerializer,
                           TokenSerializer,)
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from .permissions import SuperUserOrAdmin, Admin
+from .permissions import SuperUserOrAdmin, IsUserAdminOrReadOnly
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from django.contrib.auth.tokens import default_token_generator
@@ -123,7 +123,7 @@ class CategoryViewSet(ListCreateDestroyViewSet, viewsets.GenericViewSet):
     serializer_class = CategorySerializer
     lookup_field = 'slug'
     pagination_class = PageNumberPagination
-    # permission_class = (Admin,)
+    permission_class = (IsUserAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filterset_fields = ('name', 'slug')
     search_fields = ('name', 'slug')
@@ -144,7 +144,6 @@ class CategoryViewSet(ListCreateDestroyViewSet, viewsets.GenericViewSet):
         else:
             permission_class = (permissions.IsAdminUser,)
         return [permission() for permission in permission_class]"""
-
 
 
 class GenereaViewSet(ListCreateDestroyViewSet, viewsets.GenericViewSet): # Жанры
