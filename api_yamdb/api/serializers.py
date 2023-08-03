@@ -32,6 +32,12 @@ class TitlesSerializer(serializers.ModelSerializer):
             fields['id'] = serializers.IntegerField(required=False)
         return fields
 
+    def get_rating(self, obj):
+        reviews = Review.objects.values('score')
+        scores = [review['score'] for review in reviews]
+        average_rating = math.ceil(sum(scores) / len(scores) if scores else 0)
+        return average_rating
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(

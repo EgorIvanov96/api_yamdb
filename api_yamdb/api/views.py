@@ -124,7 +124,7 @@ class CategoryViewSet(ListCreateDestroyViewSet, viewsets.GenericViewSet):
     serializer_class = CategorySerializer
     lookup_field = 'slug'
     pagination_class = PageNumberPagination
-    # permission_class = (Admin,)
+    #permission_classes = (permissions.IsAdminUser,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filterset_fields = ('name', 'slug')
     search_fields = ('name', 'slug')
@@ -153,7 +153,7 @@ class GenereaViewSet(ListCreateDestroyViewSet, viewsets.GenericViewSet): # Жа�
     serializer_class = GenreSerializer
     lookup_field = 'slug'
     pagination_class = LimitOffsetPagination
-    # permission_class = (permissions.IsAdminUser,)
+    #permission_classes = (permissions.IsAdminUser,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filterset_fields = ('name', 'slug')
     search_fields = ('name', 'slug')
@@ -184,6 +184,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         title_id = self.kwargs.get("title_id")
+        print(title_id)
+        print(self.kwargs.get("title_id"))
+        print(self.kwargs)
         return Review.objects.filter(title=title_id)
 
     def perform_create(self, serializer):
