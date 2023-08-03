@@ -1,24 +1,25 @@
 from rest_framework import viewsets, permissions, status, filters, mixins
-from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
+from rest_framework.pagination import (LimitOffsetPagination,
+                                       PageNumberPagination)
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
 from review.models import Titles, Category, Genre, Review, Titles
-from .serializers import TitlesSerializer, CategorySerializer, GenreSerializer, ReviewSerializer, CommentsSerializer, Comments
+from .serializers import (
+    TitlesSerializer, CategorySerializer, GenreSerializer, ReviewSerializer,
+    CommentsSerializer, Comments)
 
 from users.users import User
-from .serializers import (UserRegistrationSerializer,
-                          UserSerializer,
-                          ProfileSerializer,
-                          TokenSerializer,)
+from .serializers import (
+    UserRegistrationSerializer, UserSerializer,
+    ProfileSerializer, TokenSerializer,)
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from .permissions import SuperUserOrAdmin, Admin
+from .permissions import SuperUserOrAdmin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
