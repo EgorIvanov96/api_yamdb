@@ -10,7 +10,7 @@ from .views import (
 router = DefaultRouter()
 router.register('users', UserViewSet)
 router.register(
-    r'titles/(?P<title_id>\d+)/review',
+    r'titles/(?P<title_id>\d+)/reviews',
     ReviewViewSet,
     basename='review')
 router.register(
