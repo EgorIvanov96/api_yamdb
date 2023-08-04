@@ -6,79 +6,6 @@ from users.users import User
 import datetime as dt
 
 
-class TitlesSerializer(serializers.ModelSerializer):
-    genre = serializers.SlugRelatedField(
-        slug_field='slug', queryset=Genre.objects.all(), many=True)
-    category = serializers.SlugRelatedField(
-        slug_field='slug', queryset=Category.objects.all())
-
-    class Meta:
-        fields = ('name', 'year', 'description', 'genre', 'category')
-        model = Titles
-        # read_only_fields = ('genre', 'category')
-
-    def validate_year(self, value):
-        year_now = dt.date.today().year
-        if value >= year_now:
-            raise serializers.ValidationError(
-                'Год выпуска не может быть больше текущего года!')
-        return value
-
-    def get_fields(self):
-        fields = super().get_fields()
-        if self.context['view'].action == 'retrieve':
-            fields['id'] = serializers.IntegerField()
-            fields['rating'] = serializers.SerializerMethodField()
-        elif self.context['view'].action == 'create':
-            fields['id'] = serializers.IntegerField(required=False)
-        return fields
-
-    def get_rating(self, obj):
-        reviews = Review.objects.values('score')
-        scores = [review['score'] for review in reviews]
-        average_rating = math.ceil(sum(scores) / len(scores) if scores else 0)
-        return average_rating
-
-
-class ReviewSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        read_only=True, slug_field='username')
-    #titles = serializers.PrimaryKeyRelatedField(
-    #    read_only=True, default=serializers.CurrentUserDefault())
-
-    class Meta:
-        fields = ('id', 'text', 'author', 'score', 'pub_date')
-        model = Review
-
-
-
-class CommentsSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        read_only=True, slug_field='username')
-    review = serializers.PrimaryKeyRelatedField(
-        read_only=True, default=serializers.CurrentUserDefault())
-
-    class Meta:
-        fields = '__all__'
-        model = Comments
-
-
-class CategorySerializer(serializers.ModelSerializer):
-
-    class Meta:
-        fields = ('name', 'slug')
-        model = Category
-        lookup_field = 'slug'
-
-
-class GenreSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        fields = ('name', 'slug')
-        model = Genre
-        lookup_field = 'slug'
-
-
 class UserRegistrationSerializer(serializers.Serializer):
     """Регистрация пользователя."""
     email = serializers.EmailField(max_length=254, required=True)
@@ -139,3 +66,78 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta(UserSerializer.Meta):
         model = User
         read_only_fields = ("role",)
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username')
+    #titles = serializers.PrimaryKeyRelatedField(
+    #    read_only=True, default=serializers.CurrentUserDefault())
+
+    class Meta:
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        model = Review
+
+
+
+class CommentsSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username')
+    review = serializers.PrimaryKeyRelatedField(
+        read_only=True, default=serializers.CurrentUserDefault())
+
+    class Meta:
+        fields = '__all__'
+        model = Comments
+
+
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ('name', 'slug')
+        model = Category
+        lookup_field = 'slug'
+
+
+class GenreSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ('name', 'slug')
+        model = Genre
+        lookup_field = 'slug'
+
+
+class TitlesSerializer(serializers.ModelSerializer):
+    """genre = GenreSerializer(many=True, required=False)
+    category = CategorySerializer(many=True, required=False)"""
+    genre = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Genre.objects.all(), many=True)
+    category = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Category.objects.all())
+
+    class Meta:
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+        model = Titles
+        # read_only_fields = ('category',)
+
+    def validate_year(self, value):
+        year_now = dt.date.today().year
+        if value >= year_now:
+            raise serializers.ValidationError(
+                'Год выпуска не может быть больше текущего года!')
+        return value
+
+    def get_fields(self):
+        fields = super().get_fields()
+        if self.context['view'].action == 'retrieve':
+            fields['id'] = serializers.IntegerField()
+            fields['rating'] = serializers.SerializerMethodField()
+        elif self.context['view'].action == 'create':
+            fields['id'] = serializers.IntegerField(required=False)
+        return fields
+
+    def get_rating(self, obj):
+        reviews = Review.objects.values('score')
+        scores = [review['score'] for review in reviews]
+        average_rating = math.ceil(sum(scores) / len(scores) if scores else 0)
+        return average_rating
