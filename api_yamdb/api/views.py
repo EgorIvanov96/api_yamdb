@@ -15,7 +15,7 @@ from reviews.models import Title, Category, Genre, Review
 from .serializers import (
     TitleReadSerializer, TitleWriteSerializer,
     CategorySerializer, GenreSerializer, ReviewSerializer,
-    CommentsSerializer, Comments)
+    CommentsSerializer)
 from .permissions import SuperUserOrAdmin, OwnerModerAdmin, IsAdminOrReadOnly
 from .serializers import (
     UserRegistrationSerializer, UserSerializer,
@@ -59,7 +59,8 @@ class TokenView(APIView):
         serializer = TokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:
-            user = User.objects.get(username=serializer.validated_data['username'])
+            user = User.objects.get(
+                username=serializer.validated_data['username'])
             confirmation_code = user.confirmation_code
         except User.DoesNotExist:
             return Response(
@@ -136,12 +137,12 @@ class CategoryViewSet(ListCreateDestroyViewSet, viewsets.GenericViewSet):
     search_fields = ('name', 'slug')
 
     def create(self, request, *args, **kwargs):
-        # Проверяем, что slug не дублируется
         slug = request.data.get('slug')
         existing_category = Category.objects.filter(slug=slug).first()
         if existing_category:
             return Response(status=status.HTTP_400_BAD_REQUEST,
-                            data={'error': 'Категория с таким slug уже существует.'})
+                            data={'error':
+                                  'Категория с таким slug уже существует.'})
 
         return super().create(request, *args, **kwargs)
 
@@ -157,20 +158,17 @@ class GenereaViewSet(ListCreateDestroyViewSet, viewsets.GenericViewSet):
     search_fields = ('name', 'slug')
 
     def create(self, request, *args, **kwargs):
-        # Проверяем, что slug не дублируется
         slug = request.data.get('slug')
         existing_category = Genre.objects.filter(slug=slug).first()
         if existing_category:
-            return Response(status=status.HTTP_400_BAD_REQUEST, 
-                            data={'error': 'Категория с таким slug уже существует.'})
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data={'error':
+                                  'Категория с таким slug уже существует.'})
 
         return super().create(request, *args, **kwargs)
 
 
 class TitlesViewSet(ModelViewSet):
-    """
-    Получить список всех объектов. Права доступа: Доступно без токена
-    """
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
     ).all()
