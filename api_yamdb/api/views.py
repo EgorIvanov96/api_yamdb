@@ -24,6 +24,9 @@ from .serializers import (
     UserRegistrationSerializer, UserSerializer,
     ProfileSerializer, TokenSerializer,)
 from users.users import User
+from django.db.models import Avg
+from api.filters import TitleFilter
+from django.shortcuts import get_object_or_404
 
 
 class UserRegistrationView(APIView):
