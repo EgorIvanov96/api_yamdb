@@ -109,7 +109,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         review = get_object_or_404(
             Review,
             id=self.kwargs.get('review_id'))
-        return review.comments.all()
+        return review.comments.all().order_by('-pub_date')
 
     def perform_create(self, serializer):
         review = get_object_or_404(
@@ -171,7 +171,7 @@ class GenereaViewSet(ListCreateDestroyViewSet, viewsets.GenericViewSet):
 class TitlesViewSet(ModelViewSet):
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
-    ).all()
+    ).order_by('id')
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend, )
     filterset_class = TitleFilter
