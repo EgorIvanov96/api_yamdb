@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-from review.models import Comments, Review, Titles, Genre, Category, TitleGenre
+from reviews.models import Comments, Review, Title, Genre, Category, TitleGenre
 from users.users import User
 
 
-admin.site.register(Titles)
+admin.site.register(Title)
 admin.site.register(Comments)
 admin.site.register(Review)
 admin.site.register(TitleGenre)

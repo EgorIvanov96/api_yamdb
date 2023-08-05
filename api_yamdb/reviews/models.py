@@ -20,10 +20,9 @@ class Genre(models.Model):
         return self.name
 
 
-class Titles(models.Model):
+class Title(models.Model):
     name = models.CharField('Название', max_length=256)
     year = models.IntegerField('Год')
-    # rating = models.SmallAutoField()
     description = models.TextField('Описание', blank=True)
     category = models.ForeignKey(
         Category,
@@ -35,7 +34,7 @@ class Titles(models.Model):
         Genre,
         blank=True,
         through='TitleGenre',
-        related_name='titles'
+        related_name='title'
     )
 
     def __str__(self):
@@ -43,7 +42,7 @@ class Titles(models.Model):
 
 
 class TitleGenre(models.Model):
-    title = models.ForeignKey(Titles, on_delete=models.CASCADE)
+    title = models.ForeignKey(Title, on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
 
     class Meta:
@@ -51,15 +50,37 @@ class TitleGenre(models.Model):
 
 
 class Review(models.Model):
-    text = models.TextField()
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='reviews')
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+    pub_date = models.DateTimeField(
+        'Дата отзыва',
+        auto_now_add=True,
+        db_index=True
+    )
+    text = models.TextField()
     score = models.IntegerField(
         'Оценка',
-        validators=[MinValueValidator(1), MaxValueValidator(10)])
-    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
-    titles = models.ForeignKey(
-        Titles, on_delete=models.CASCADE, related_name='reviews')
+        default=0,
+        validators=[
+            MaxValueValidator(10),
+            MinValueValidator(1)
+        ],
+    )
+
+    class Meta:
+        ordering = ['-pub_date']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'title'], name="unique_review")
+        ]
 
 
 class Comments(models.Model):
