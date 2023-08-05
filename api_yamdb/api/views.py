@@ -42,12 +42,12 @@ class UserRegistrationView(APIView):
         user.confirmation_code = confirmation_code
         user.save()
         send_mail(
-                'Your Confirmation code',
-                user.confirmation_code,
-                ['yamdb@mail.com'],
-                (email, ),
-                fail_silently=False
-            )
+            'Your Confirmation code',
+            user.confirmation_code,
+            ['yamdb@mail.com'],
+            (email, ),
+            fail_silently=False
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -91,7 +91,7 @@ class UserViewSet(ModelViewSet):
         detail=False,
         url_path='me',
         permission_classes=(IsAuthenticated,),
-        )
+    )
     def get_user_info(self, request):
         serializer = ProfileSerializer(request.user, data=request.data,
                                        partial=True)
