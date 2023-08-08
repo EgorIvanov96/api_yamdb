@@ -9,6 +9,9 @@ class Category(models.Model):
     slug = models.SlugField('Идентификатор', max_length=50, unique=True)
 
     def __str__(self):
+        max_length = 256
+        if len(self.name) > max_length:
+            return ('Превышено максимальное количество символов!')
         return self.name
 
 
@@ -17,6 +20,9 @@ class Genre(models.Model):
     slug = models.SlugField('Идентификатор', max_length=50)
 
     def __str__(self):
+        max_length = 256
+        if len(self.name) > max_length:
+            return ('Превышено максимальное количество символов!')
         return self.name
 
 
@@ -38,6 +44,9 @@ class Title(models.Model):
     )
 
     def __str__(self):
+        max_length = 256
+        if len(self.name) > max_length:
+            return ('Превышено максимальное количество символов!')
         return self.name
 
 
