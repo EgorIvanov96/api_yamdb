@@ -42,3 +42,15 @@ pip install -r requirements.txt
 ```bash
 python manage.py runserver
 ```
+
+### Ссылка на документацию API
+```bash
+http://127.0.0.1:8000/redoc/
+```
+
+## В разработке использованы
+
+* [Python](https://www.python.org/)
+* [Django](https://www.djangoproject.com/)
+* [Django REST framework](https://www.django-rest-framework.org/)
+* [DRF Simple JWT](https://django-rest-framework-simplejwt.readthedocs.io/en/latest/)
