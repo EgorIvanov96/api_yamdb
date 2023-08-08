@@ -14,7 +14,11 @@
 
 Добавлять отзывы, комментарии и ставить оценки могут только аутентифицированные пользователи.
 
+<<<<<<< HEAD
 ### Запуск
+=======
+### Запуск (ОС Windows)
+>>>>>>> 3c8e575857f2ec289760d24991fc86862b799e14
 ```bash
 git clone git@github.com:EgorIvanov96/api_yamdb.git
 ```
@@ -29,7 +33,11 @@ python -m venv venv
 ```bash
 source venv/Scripts/activate
 ```
+<<<<<<< HEAD
 - Linux/iOS:
+=======
+- Linux:
+>>>>>>> 3c8e575857f2ec289760d24991fc86862b799e14
 ```bash
 source venv/bin/activate
 ```
@@ -42,3 +50,18 @@ pip install -r requirements.txt
 ```bash
 python manage.py runserver
 ```
+<<<<<<< HEAD
+=======
+
+### Ссылка на документацию API
+```bash
+http://127.0.0.1:8000/redoc/
+```
+
+## В разработке использованы
+
+* [Python](https://www.python.org/)
+* [Django](https://www.djangoproject.com/)
+* [Django REST framework](https://www.django-rest-framework.org/)
+* [DRF Simple JWT](https://django-rest-framework-simplejwt.readthedocs.io/en/latest/)
+>>>>>>> 3c8e575857f2ec289760d24991fc86862b799e14
