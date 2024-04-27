@@ -14,6 +14,13 @@
 
 Добавлять отзывы, комментарии и ставить оценки могут только аутентифицированные пользователи.
 
+## В разработке использованы
+
+* [Python](https://www.python.org/)
+* [Django](https://www.djangoproject.com/)
+* [Django REST framework](https://www.django-rest-framework.org/)
+* [DRF Simple JWT](https://django-rest-framework-simplejwt.readthedocs.io/en/latest/)
+
 
 ### Запуск
 
@@ -49,11 +56,3 @@ python manage.py runserver
 ```bash
 http://127.0.0.1:8000/redoc/
 ```
-
-## В разработке использованы
-
-* [Python](https://www.python.org/)
-* [Django](https://www.djangoproject.com/)
-* [Django REST framework](https://www.django-rest-framework.org/)
-* [DRF Simple JWT](https://django-rest-framework-simplejwt.readthedocs.io/en/latest/)
-
