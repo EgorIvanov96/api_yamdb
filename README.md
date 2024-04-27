@@ -40,9 +40,11 @@ python -m venv venv
 ```bash
 source venv/Scripts/activate
 ```
-
+<<<<<<< HEAD
 - Linux/iOS:
-
+=======
+- Linux:
+>>>>>>> 3c8e575857f2ec289760d24991fc86862b799e14
 ```bash
 source venv/bin/activate
 ```
