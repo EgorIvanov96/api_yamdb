@@ -35,30 +35,31 @@ cd yamdb_final
 ### Создаем и активируем виртуальное окружение:
 ```bash
 python -m venv venv
+
 ```
 - Windows:
 ```bash
 source venv/Scripts/activate
 ```
-<<<<<<< HEAD
+
 - Linux/iOS:
-=======
-- Linux:
->>>>>>> 3c8e575857f2ec289760d24991fc86862b799e14
 ```bash
 source venv/bin/activate
 ```
 
 ### Ставим зависимости из requirements.txt:
+
 ```bash
 pip install -r requirements.txt 
 ```
 ### Переходим в папку с файлом manage.py и запускаем сервер
+
 ```bash
 python manage.py runserver
 ```
 
 ### Ссылка на документацию API
+
 ```bash
 http://127.0.0.1:8000/redoc/
 ```
